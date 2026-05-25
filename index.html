@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Storyline 360 Yerel Oyunlaştırma Modülü</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Arka Plan Canlı Efektler -->
+  <canvas id="particle-canvas"></canvas>
+  <div class="ambient-light ambient-cyan"></div>
+  <div class="ambient-light ambient-purple"></div>
+
+  <!-- Ana Kart Arayüzü -->
+  <div class="main-wrapper">
+    
+    <!-- Üst Başlık & Menü Navigasyon (Varsayılan olarak gizlidir, girişten sonra açılır) -->
+    <header class="app-header" id="app-navigation" style="display: none;">
+      <div class="header-info">
+        <div class="player-avatar">S</div>
+        <div class="player-details">
+          <h3 class="user-display-name">Oyuncu</h3>
+          <p class="user-display-score">0 Puan</p>
+        </div>
+      </div>
+      
+      <nav class="app-nav">
+        <button class="nav-item active" data-screen="quiz">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Sınav Testi
+        </button>
+        <button class="nav-item" data-screen="leaderboard">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/></svg>
+          Liderlik Tablosu
+        </button>
+        <button class="nav-item" data-screen="badges">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Başarılar
+        </button>
+      </nav>
+    </header>
+
+    <!-- 1. GİRİŞ EKRANI -->
+    <section class="screen active" id="welcome-screen">
+      <div class="welcome-container">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h1 class="welcome-title">Storyline Bilgi Yarışması</h1>
+        <p class="welcome-subtitle">
+          Soruları olabildiğince hızlı ve doğru cevapla, en yüksek skoru elde ederek liderlik tablosundaki yerini al ve başarı rozetlerini kazan!
+        </p>
+        
+        <form id="welcome-form" class="form-group">
+          <div class="input-container">
+            <input type="text" id="player-name-input" placeholder="Lütfen adınızı girin..." required autocomplete="off" maxlength="15">
+          </div>
+          <button type="submit" class="btn-primary">
+            Başla
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+          </button>
+          <button type="button" id="btn-view-leaderboard-welcome" class="btn-secondary" style="display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: hsl(var(--color-gold));"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+            En İyi Skorları Gör
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2. SINAV / SORU EKRANI -->
+    <section class="screen" id="quiz-screen">
+      <div class="quiz-container">
+        
+        <div class="quiz-header">
+          <div class="progress-section">
+            <div class="progress-labels">
+              <div class="question-counter-badge">
+                SORU <span class="current-q-index" id="current-q-num">01</span>
+                <span class="q-divider">/</span>
+                <span class="total-q-count" id="total-q-num">08</span>
+              </div>
+              <div class="difficulty-badge diff-kolay" id="quiz-difficulty-badge">KOLAY</div>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" id="quiz-progress-fill"></div>
+            </div>
+          </div>
+          
+          <div class="quiz-stats">
+            <div class="stat-box" id="quiz-timer-box">
+              <span class="stat-label">Süre</span>
+              <span class="stat-val" id="quiz-timer-val">15s</span>
+            </div>
+
+            <div class="stat-box">
+              <span class="stat-label">Skor</span>
+              <span class="stat-val score" id="quiz-score-val">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Soru Kartı -->
+        <div class="question-card" id="question-box">
+          <!-- Dinamik Soru Metni Buraya Yüklenecek -->
+        </div>
+
+        <!-- Şıklar Tablosu -->
+        <div class="choices-grid" id="choices-box">
+          <!-- Şık butonları dinamik olarak buraya eklenecek -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2B. ÖZET / SINAV SONUÇ EKRANI -->
+    <section class="screen" id="summary-screen">
+      <div class="summary-container">
+        <h2 class="summary-title">Tebrikler, Sınavı Tamamladın!</h2>
+        <p class="summary-subtitle">İşte sınav performansının detaylı özeti ve kazanımların:</p>
+        
+        <div class="summary-stats-grid">
+          <div class="summary-stat-card">
+            <span class="summary-stat-label">Doğru Cevaplar</span>
+            <span class="summary-stat-val correct" id="summary-correct-count">0</span>
+          </div>
+          <div class="summary-stat-card">
+            <span class="summary-stat-label">Yanlış Cevaplar</span>
+            <span class="summary-stat-val incorrect" id="summary-incorrect-count">0</span>
+          </div>
+          <div class="summary-stat-card">
+            <span class="summary-stat-label">Sınav Taban Puanı</span>
+            <span class="summary-stat-val" id="summary-base-score">0</span>
+          </div>
+          <div class="summary-stat-card glowing">
+            <span class="summary-stat-label">Zaman Bonusu</span>
+            <span class="summary-stat-val bonus" id="summary-time-bonus">+0</span>
+          </div>
+        </div>
+
+        <div class="summary-total-score-box">
+          <span class="total-score-label">TOPLAM SKOR</span>
+          <span class="total-score-val" id="summary-total-score">0</span>
+          <div class="score-progress-bar">
+            <div class="score-progress-fill" id="summary-score-fill"></div>
+          </div>
+          <span class="lms-status-label" id="summary-lms-status">Durum: Geçti</span>
+        </div>
+
+        <div class="summary-badges-section">
+          <h3>Kazanılan Rozetler</h3>
+          <div class="summary-badges-list">
+            <div class="summary-badge-mini bronze" id="summary-badge-bronze">
+              <div class="summary-badge-mini-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke-width="2" stroke="currentColor" fill="none"/>
+                  <path d="M8 12h8m-4-4v8"/>
+                </svg>
+              </div>
+              <span>Bronz Kâşif</span>
+            </div>
+            <div class="summary-badge-mini silver" id="summary-badge-silver">
+              <div class="summary-badge-mini-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke-width="2" stroke="currentColor" fill="none"/>
+                  <path d="M8 9l4 4 4-4m-8 6h8"/>
+                </svg>
+              </div>
+              <span>Gümüş Uzman</span>
+            </div>
+            <div class="summary-badge-mini gold" id="summary-badge-gold">
+              <div class="summary-badge-mini-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-width="2" stroke="currentColor" fill="none"/>
+                </svg>
+              </div>
+              <span>Altın Şampiyon</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-actions">
+          <button class="btn-secondary" id="btn-review-questions">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            Soruları İncele
+          </button>
+          <button class="btn-primary" id="btn-finish-summary">
+            Skor Tablosuna Git
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. LİDERLİK TABLOSU EKRANI -->
+    <section class="screen" id="leaderboard-screen">
+      <div class="leaderboard-container">
+        
+        <div class="leaderboard-title-section">
+          <h2>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: hsl(var(--color-gold));"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+            En İyi Skorlar (Top 50)
+          </h2>
+          
+          <div class="search-container">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+            <input type="text" id="search-input" placeholder="İsim ara...">
+          </div>
+        </div>
+
+        <!-- 3D Podyum Alanı -->
+        <div class="podium-area">
+          
+          <!-- 2. LİK -->
+          <div class="podium-spot podium-2nd" id="podium-2nd-spot">
+            <div class="podium-avatar">2</div>
+            <div class="podium-name">-</div>
+            <div class="podium-score">0 Pts</div>
+            <div class="podium-pillar">2</div>
+          </div>
+          
+          <!-- 1. LİK (Altın Taçlı) -->
+          <div class="podium-spot podium-1st" id="podium-1st-spot">
+            <div class="podium-crown">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 4l3 5 7-6 7 6 3-5v14H2V4z"/>
+              </svg>
+            </div>
+            <div class="podium-avatar">1</div>
+            <div class="podium-name">-</div>
+            <div class="podium-score">0 Pts</div>
+            <div class="podium-pillar">1</div>
+          </div>
+          
+          <!-- 3. LÜK -->
+          <div class="podium-spot podium-3rd" id="podium-3rd-spot">
+            <div class="podium-avatar">3</div>
+            <div class="podium-name">-</div>
+            <div class="podium-score">0 Pts</div>
+            <div class="podium-pillar">3</div>
+          </div>
+          
+        </div>
+
+        <!-- Alt Sıralar Tablosu (4 ve 5) -->
+        <div class="leaderboard-list" id="leaderboard-list-box">
+          <!-- 4. ve 5. sıralar buraya render edilecek -->
+        </div>
+
+        <!-- Giriş Yapılmadıysa Sınava Katıl/Geri Dön Butonu -->
+        <div class="leaderboard-actions" id="leaderboard-welcome-actions" style="display: none; margin-top: 15px; width: 100%; flex-shrink: 0;">
+          <button class="btn-primary" id="btn-back-to-welcome" style="width: 100%; padding: 14px; display: flex; justify-content: center; align-items: center; gap: 10px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
+            Giriş Ekranına Dön ve Sınava Katıl
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 4. ROZET PANELİ -->
+    <section class="screen" id="badges-screen">
+      <div class="badges-container">
+        
+        <div class="badges-header">
+          <h2>Kazanılan Rozetler</h2>
+          <p>Sınavdaki başarına göre kilidi açılan yerel Storyline başarı rozetleri.</p>
+        </div>
+
+        <div class="badges-grid">
+          
+          <!-- BRONZ ROZET -->
+          <div class="badge-card bronze" id="badge-bronze-card">
+            <div class="badge-glow"></div>
+            <div class="badge-icon-wrapper">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke-width="1.5" stroke="currentColor" fill="none"/>
+                <path d="M8 12h8m-4-4v8"/>
+              </svg>
+            </div>
+            <h3>Bronz Kâşif</h3>
+            <p>Sınavdan en az 50 puan alarak ilk temel başarı kilidini açın.</p>
+            <span class="badge-status">Kilitli</span>
+          </div>
+          
+          <!-- GÜMÜŞ ROZET -->
+          <div class="badge-card silver" id="badge-silver-card">
+            <div class="badge-glow"></div>
+            <div class="badge-icon-wrapper">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke-width="1.5" stroke="currentColor" fill="none"/>
+                <path d="M8 9l4 4 4-4m-8 6h8"/>
+              </svg>
+            </div>
+            <h3>Gümüş Uzman</h3>
+            <p>Sınavdan en az 80 puan alarak ileri düzey bilginizi kanıtlayın.</p>
+            <span class="badge-status">Kilitli</span>
+          </div>
+          
+          <!-- ALTIN ROZET -->
+          <div class="badge-card gold" id="badge-gold-card">
+            <div class="badge-glow"></div>
+            <div class="badge-icon-wrapper">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-width="1.5" stroke="currentColor" fill="none"/>
+              </svg>
+            </div>
+            <h3>Altın Şampiyon</h3>
+            <p>Soruların tamamına (100 Tam Puan) doğru cevap vererek kusursuz başarıya ulaşın.</p>
+            <span class="badge-status">Kilitli</span>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- --- STORYLINE 360 DEVELOPER BRIDGE CONSOLE (KOLAY ENTEGRASYON ÇEKMECESİ) --- -->
+  <button class="dev-toggle-btn" id="dev-toggle-btn" style="display: none;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    Storyline Konsolu
+  </button>
+
+  <div class="dev-drawer" id="dev-drawer">
+    <div class="dev-header">
+      <div class="dev-header-left">
+        <div class="dev-dot"></div>
+        <h4>STORYLINE 360 KÖPRÜ PANELİ</h4>
+      </div>
+      
+      <div class="dev-tabs">
+        <button class="dev-tab active" data-tab="vars">Değişkenler</button>
+        <button class="dev-tab" data-tab="code">Hazır JS Kodları</button>
+        <button class="dev-tab" data-tab="guide">Entegrasyon Kılavuzu</button>
+      </div>
+
+      <button class="dev-close-btn" id="dev-close-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- TAB 1: Değişkenler İzleme Paneli -->
+    <div class="dev-content active" id="dev-tab-vars">
+      <div class="vars-grid" id="vars-grid-box">
+        <!-- Değişkenler ve anlık simüle edilen değerleri JavaScript tarafından buraya yazılacak -->
+      </div>
+      
+      <div class="dev-actions">
+        <button class="btn-secondary danger" id="btn-reset-db">
+          Liderlik Tablosunu Sıfırla
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 2: Kopyalanabilir Hazır JavaScript Tetikleyicileri (KOD 1 & KOD 2) -->
+    <div class="dev-content" id="dev-tab-code">
+      <div class="code-generator-wrapper">
+        <div class="code-selector">
+          <button class="code-selector-btn active" data-code="load">KOD 1: Tablo Yükleme (Slayt Girişinde)</button>
+          <button class="code-selector-btn" data-code="save">KOD 2: Skor Kaydetme (Quiz Bitiminde)</button>
+          <button class="code-selector-btn" data-code="scorm">KOD 3: Moodle SCORM Gönderimi (Gradebook)</button>
+        </div>
+        
+        <div class="code-display-container">
+          <button class="btn-copy" id="btn-copy-code">Kodu Kopyala</button>
+          <pre class="code-display" id="code-output"><!-- Hazır Kodlar JavaScript tarafından buraya basılacak --></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Storyline 360 Projesine Ekleme Kılavuzu -->
+    <div class="dev-content" id="dev-tab-guide">
+      <div class="guide-container">
+        <div class="guide-step">
+          <div class="step-num">1</div>
+          <p>
+            Storyline 360 projenizde şu değişkenleri oluşturun: <strong>playerName</strong> (Text), <strong>playerScore</strong> (Number), <strong>rank1_name</strong> ... <strong>rank5_name</strong> (Text), <strong>rank1_score</strong> ... <strong>rank5_score</strong> (Number), <strong>badge_bronze</strong>, <strong>badge_silver</strong>, <strong>badge_gold</strong> (True/False).
+          </p>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">2</div>
+          <p>
+            Puan durumunu veya ilk açılış ekranını göstermek istediğiniz slayta <strong>"Hazır JS Kodları"</strong> sekmesindeki <strong>KOD 1</strong>'i ekleyin (Slayt Yüklendiğinde tetiklenecek).
+          </p>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">3</div>
+          <p>
+            Quiz tamamlandığında veya "Skoru Kaydet" butonuna tıklandığında çalışmak üzere <strong>KOD 2</strong>'yi bir JS tetikleyicisi olarak ekleyin.
+          </p>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">4</div>
+          <p>
+            Bu uygulamanın bulunduğu klasörü Storyline projenize bir <strong>Web Object (Web Nesnesi)</strong> olarak ekleyerek sınavınızı ve liderlik ekranınızı tek bir şık entegre modül halinde doğrudan kullanın.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 2C. SORULARI İNCELEME MODALI (POPUP OVERLAY) -->
+  <div class="review-modal" id="review-modal">
+    <div class="review-modal-content">
+      <div class="review-modal-header">
+        <h3>Soruları Gözden Geçir</h3>
+        <button class="review-close-btn" id="btn-close-review">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      
+      <div class="review-question-container">
+        <div class="review-progress" id="review-progress-text">SORU 1 / 8</div>
+        <div class="review-question-card" id="review-question-box">
+          <!-- Soru metni dinamik olarak buraya basılacak -->
+        </div>
+        <div class="review-choices-grid" id="review-choices-box">
+          <!-- Şık butonları (tıklanamaz) dinamik olarak buraya basılacak -->
+        </div>
+        <div class="review-details" id="review-details-box">
+          <div class="review-details-left">
+            <span>Senin Cevabın: </span>
+            <span class="review-status-text" id="review-status-text">Doğru</span>
+          </div>
+          <div class="review-details-right" id="review-time-text">
+            Kalan Süre: 12s
+          </div>
+        </div>
+      </div>
+
+      <div class="review-modal-footer">
+        <button class="btn-secondary" id="btn-prev-review">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          Önceki
+        </button>
+        <button class="btn-secondary" id="btn-next-review">
+          Sonraki
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# Storyline 360 Leaderboard - Git Ignore
+.vscode/
+config.json
+*.log
+.DS_Store
