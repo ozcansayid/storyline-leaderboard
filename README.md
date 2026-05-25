@@ -16,6 +16,21 @@ Ayrıca modül, Storyline 360'ın kendi SCORM motoruyla çift yönlü değişken
 
 ---
 
+## 🔌 Entegrasyon Modelleri: Hangisini Seçmelisiniz?
+
+Bu modülü Storyline 360 projenizde iki farklı yöntemle entegre edebilirsiniz:
+
+### Yöntem A: 🚀 Tam Web Nesnesi Modu (Önerilen - En Kolay & Modern Yol)
+*   **Nasıl Çalışır?**: Sınav ekranı, Soruları İnceleme modalı, Özet ekranı ve Liderlik Tablosu **tamamen bu Web Nesnesi (iframe) arayüzü ile** Storyline slaytı üzerinde gösterilir.
+*   **Tetikleyici Gereksinimi**: Bu yöntemde **KOD 1 ve KOD 2'ye hiç ihtiyacınız yoktur!** Çünkü tüm veritabanı okuma, yazma ve Firebase kayıt işlemleri Web Nesnesi tarafından otomatik yapılır.
+*   **Moodle İçin Tek Gereksinim**: Sadece puanı Moodle not defterine göndermek için **KOD 3** tetikleyicisini eklemeniz yeterlidir.
+
+### Yöntem B: 🔗 Hibrit Mod (Storyline Sınavı + Web Nesnesi Liderlik Tablosu)
+*   **Nasıl Çalışır?**: Sınav sorularını Storyline'ın kendi yerel slaytlarında hazırlarsınız. Kullanıcı testi bitirdiğinde, veriler Storyline üzerinden yerel veritabanına kaydedilir ve Web Nesnesi sadece "Skor Tablosunu Göstermek" için çağrılır.
+*   **Tetikleyici Gereksinimi**: Bu yöntemde Storyline'ın veritabanı ile konuşabilmesi için **KOD 1 ve KOD 2 tetikleyicilerinin her ikisini de** projenize eklemeniz gerekmektedir.
+
+---
+
 ## 🏗️ 1. Storyline Değişkenleri (Variables) Kurulumu
 
 Entegrasyonun çalışabilmesi için Articulate Storyline 360 editöründeki **Variables (Değişkenler)** panelinden aşağıdaki değişkenleri tam olarak belirtilen isim ve türlerle tanımlamanız gerekmektedir. Değişkenler tanımlanmadığı takdirde tarayıcı konsolunda uyarılar görünecek ve Moodle'a puan aktarımı sağlanamayacaktır.
